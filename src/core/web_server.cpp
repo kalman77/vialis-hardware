@@ -38,6 +38,7 @@ void WebServerManager::handleRoot() {
 void WebServerManager::handleStatus() {
     DynamicJsonDocument doc(256);
     doc["animation"] = animations->isRunning();
+    Logger::info(doc["animation"]);
     doc["brightness"] = brightness->get();
     doc["speed"] = "controlled";
     String json;
@@ -52,33 +53,55 @@ void WebServerManager::handleToggleAnimation() {
 }
 
 void WebServerManager::handleSpeed() {
-    if (server.hasArg("value")) {
-        int speed = server.arg("value").toInt();
-        animations->setSpeed(speed);
-        server.send(200, "application/json", "{\"status\":\"speed updated\"}");
-    } else {
-        server.send(400, "application/json", "{\"error\":\"missing value\"}");
+    if (server.hasArg("plain")) {
+        String body = server.arg("plain");
+        DynamicJsonDocument doc(256);
+        deserializeJson(doc, body);
+        if (doc.containsKey("speed")) {
+            int speed = server.arg("speed").toInt();
+            animations->setSpeed(speed);
+            server.send(200, "application/json", "{\"status\":\"speed updated\"}");
+        } else {
+            server.send(400, "application/json", "{\"error\":\"missing value\"}");
+        }
     }
 }
 
 void WebServerManager::handleBrightness() {
-    if (server.hasArg("value")) {
-        int value = server.arg("value").toInt();
-        brightness->set(value);
-        server.send(200, "application/json", "{\"status\":\"brightness updated\"}");
-    } else {
-        server.send(400, "application/json", "{\"error\":\"missing value\"}");
+    if (server.hasArg("plain")) {
+        String body = server.arg("plain"); // raw request body
+        DynamicJsonDocument doc(256);
+        deserializeJson(doc, body);
+        if (doc.containsKey("brightness")) {
+            int value = doc["brightness"];
+            brightness->set(value);
+            server.send(200, "application/json", "{\"status\":\"brightness updated\"}");
+        } else {
+            server.send(400, "application/json", "{\"error\":\"missing value\"}");
+        }
     }
+
 }
 
 void WebServerManager::handleColor() {
-    if (server.hasArg("r") && server.hasArg("g") && server.hasArg("b")) {
-        int R = server.arg("r").toInt();
-        int G = server.arg("g").toInt();
-        int B = server.arg("b").toInt();
-        ledController->setColor(R, G, B);
-        server.send(200, "application/json", "{\"status\":\"color updated\"}");
-    } else {
-        server.send(400, "application/json", "{\"error\":\"missing RGB values\"}");
+    if (server.hasArg("plain")) {
+        String body = server.arg("plain");
+        DynamicJsonDocument doc(256);
+        Serial.print("GETTING COLOR NOW");
+        deserializeJson(doc, body);
+        // Serial.println(doc);
+        if (doc.containsKey("r") && doc.containsKey("g") && doc.containsKey("b")) {
+            int R = doc["r"];
+            int G = doc["g"];
+            int B = doc["b"];
+            ledController->setColor(R, G, B);
+            Serial.println(R);
+            Serial.println(G);
+            Serial.println(B);
+            server.send(200, "application/json", "{\"status\":\"color updated\"}");
+        }
+        else {
+            server.send(400, "application/json", "{\"error\":\"missing RGB values\"}");
+        } 
     }
 }

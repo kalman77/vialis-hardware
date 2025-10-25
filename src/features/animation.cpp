@@ -10,7 +10,7 @@ AnimationManager::AnimationManager(LedController* controller)
 
 void AnimationManager::toggle()
 {
-    running = !running;
+    state.animationOn = !state.animationOn;
 }
 
 void AnimationManager::loop()
@@ -23,7 +23,9 @@ void AnimationManager::loop()
     {
         state.lastUpdate = now;
 
-        ledController->setColor(currentR, currentG, currentB);
+        AnimationManager::ledController->strip.clear();
+        AnimationManager::ledController->strip.setPixelColor(state.currentLED, AnimationManager::ledController->strip.Color(state.r, state.g, state.b));
+        AnimationManager::ledController->strip.show();
 
         if (state.currentLED >= NUM_LEDS - 1 && state.static_index != -1)
         {
@@ -52,13 +54,6 @@ void AnimationManager::start()
 void AnimationManager::setSpeed(int ms)
 {
     state.speedDelay = ms;
-}
-
-void AnimationManager::setCurrentColor(uint8_t r, uint8_t g, uint8_t b)
-{
-    currentR = r;
-    currentG = g;
-    currentB = b;
 }
 
 bool AnimationManager::isRunning() const 

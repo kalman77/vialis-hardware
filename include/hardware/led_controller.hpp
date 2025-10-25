@@ -5,11 +5,11 @@
 
 class LedController {
 private:
-    Adafruit_NeoPixel strip;
 public:
+    Adafruit_NeoPixel strip;
     LedController();
     void begin();
-    void setColor(uint8_t, uint8_t, uint8_t);
+    void setColor(int, int, int);
     void setBrightness(uint8_t);
     uint32_t getColor() const;
     uint8_t getBrightness() const;

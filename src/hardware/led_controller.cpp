@@ -10,11 +10,14 @@ void LedController::begin()
     strip.show();
 }
 
-void LedController::setColor(uint8_t r, uint8_t g, uint8_t b)
+void LedController::setColor(int r, int g, int b)
 {
     strip.clear();
     strip.setPixelColor(state.currentLED, strip.Color(r, g, b));
     strip.show();
+    state.r = r;
+    state.g = g;
+    state.b = b;
 }
 
 void LedController::setBrightness(uint8_t value)

@@ -18,7 +18,7 @@ BrightnessController brightness(&leds);
 WebServerManager webServer(&leds, &animations, &brightness);
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Logger::info("System boot...");
 
     wifi.begin(state.ssid, state.pswd);
