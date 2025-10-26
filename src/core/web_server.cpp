@@ -5,8 +5,9 @@
 WebServerManager::WebServerManager(
     LedController* led,
     AnimationManager* anim,
-    BrightnessController* bright
-) : server(80), ledController(led), animations(anim), brightness(bright) {}
+    BrightnessController* bright,
+    IRealtime* rt
+) : server(80), ledController(led), animations(anim), brightness(bright), realtime(rt) {}
 
 void WebServerManager::begin() {
     setupRoutes();

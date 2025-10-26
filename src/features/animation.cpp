@@ -21,6 +21,11 @@ void AnimationManager::loop()
     unsigned long now = millis();
     if (now - state.lastUpdate >= (unsigned long)state.speedDelay)
     {
+        Serial.print("SpeedDelay=");
+        Serial.println(state.speedDelay);
+        Serial.print("Delta=");
+        Serial.println(now - state.lastUpdate);
+        Serial.println(state.lastUpdate);
         state.lastUpdate = now;
 
         AnimationManager::ledController->strip.clear();

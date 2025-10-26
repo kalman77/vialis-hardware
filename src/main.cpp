@@ -9,13 +9,15 @@
 #include "config.hpp"
 #include "state.hpp"
 #include "config.hpp"
+#include "core/websocket_manager.hpp"
 
 WifiManager wifi;
 LedController leds;
-Joystick joystick;
 AnimationManager animations(&leds);
 BrightnessController brightness(&leds);
-WebServerManager webServer(&leds, &animations, &brightness);
+WebsocketManager wsManager(&brightness);
+WebServerManager webServer(&leds, &animations, &brightness, (IRealtime*)&wsManager);
+Joystick joystick((IRealtime*)&wsManager);
 
 void setup() {
     Serial.begin(9600);
@@ -23,6 +25,7 @@ void setup() {
 
     wifi.begin(state.ssid, state.pswd);
     webServer.begin();
+    wsManager.begin();
 
     leds.begin();
     joystick.begin();
@@ -33,6 +36,7 @@ void setup() {
 void loop() {
     wifi.loop();
     webServer.loop();
+    //wsManager.loop();
     joystick.loop();
     animations.loop();
 }

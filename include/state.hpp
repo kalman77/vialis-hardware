@@ -4,7 +4,7 @@
 
 struct State
 {
-    uint8_t speedDelay = (uint8_t) 1000;
+    int speedDelay = 1000;
     uint8_t r = 255, g = 0, b = 0;
     bool animationOn = true;
     bool clientConnected = false;

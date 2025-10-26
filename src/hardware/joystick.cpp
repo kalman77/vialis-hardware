@@ -2,6 +2,9 @@
 #include "hardware/joystick.hpp"
 #include "config.hpp"
 #include <Arduino.h>
+#include <ArduinoJson.h>
+
+Joystick::Joystick(IRealtime* rt) : realtime(rt) {}
 
 void Joystick::begin() {
     pinMode(JOY_SW, INPUT_PULLUP);
@@ -22,16 +25,37 @@ void Joystick::loop() {
     static bool moved = false;  
 
     if (xValue < 400 && !moved) {       // LEFT
-        state.speedDelay = min(state.speedDelay * 2, 2000); 
+        Serial.print("[JOYSTICK LEFT BEFORE CHANGE] speed delay is ");
+        Serial.println(state.speedDelay);
+        state.speedDelay = min(state.speedDelay + 50, 3000); 
+        Serial.print("[JOYSTICK LEFT AFTER CHANGE] speed delay is ");
+        Serial.println(state.speedDelay);
+        if (realtime) {
+            DynamicJsonDocument d(64);
+            d["speedDelay"] = state.speedDelay;
+            String p; 
+            serializeJson(d, p);
+            realtime->broadcast("speed", p);
+        }
         // Serial.println("Joystick LEFT → Slower speed: " + String(speedDelay));
         moved = true;
     } 
-    else if (xValue > 600 && !moved) {  // RIGHT
-        state.speedDelay = max(state.speedDelay / 2, 100);
+    if (xValue > 600 && !moved) {  // RIGHT
+        Serial.print("[JOYSTICK RIGHT BEFORE CHANGE] speed delay is ");
+        Serial.println(state.speedDelay);
+        state.speedDelay = max(state.speedDelay - 50, 10);
+        Serial.print("[JOYSTICK RIGHT AFTER CHANGE] speed delay is ");
+        Serial.println(state.speedDelay);
+        if (realtime) {
+            DynamicJsonDocument d(64);
+            d["speedDelay"] = state.speedDelay;
+            String p; serializeJson(d, p);
+            realtime->broadcast("speed", p);
+        }
         // Serial.println("Joystick RIGHT → Faster speed: " + String(speedDelay));
         moved = true;
     } 
-    else if (xValue >= 400 && xValue <= 600) {
+    if (xValue >= 400 && xValue <= 600) {
         moved = false; 
     }
 
