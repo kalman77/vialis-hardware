@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+<<<<<<< HEAD
 struct State
 {
     int speedDelay = 1000;
@@ -20,3 +21,15 @@ struct State
 };
 
 extern State state;
+=======
+uint8_t speedDelay = 1000;
+uint8_t r = 255, g = 0, b = 0;
+bool animationOn = true;
+bool clientConnected = false;
+
+bool first = true;
+
+uint8_t currentLED = 0;
+unsigned long lastUpdate = 0;
+uint8_t static_index = 1;
+>>>>>>> dae31fb (commit for switching to new computer)

@@ -5,6 +5,12 @@
 
 #define JOY_X A0 // Analog input for X-axis
 #define JOY_SW D1
+<<<<<<< HEAD
 #define JOY_Y A0
 
 #define SERVER_PORT 80
+=======
+
+const char *ssid = "ESP8266_AP";
+const char *pswd = "123456789#";
+>>>>>>> dae31fb (commit for switching to new computer)
