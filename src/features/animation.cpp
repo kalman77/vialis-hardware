@@ -46,14 +46,14 @@ void AnimationManager::loop()
     }
 }
 
-void AnimationManager::stop() 
-{ 
-    running = false;
+void AnimationManager::stop()
+{
+    state.animationOn = false;
 }
 
-void AnimationManager::start() 
-{ 
-    running = true; 
+void AnimationManager::start()
+{
+    state.animationOn = true;
 }
 
 void AnimationManager::setSpeed(int ms)
@@ -61,7 +61,7 @@ void AnimationManager::setSpeed(int ms)
     state.speedDelay = ms;
 }
 
-bool AnimationManager::isRunning() const 
-{ 
-    return running; 
+bool AnimationManager::isRunning() const
+{
+    return state.animationOn;
 }

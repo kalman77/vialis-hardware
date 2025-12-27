@@ -5,7 +5,6 @@
 class AnimationManager
 {
     LedController* ledController;
-    bool running = true;
 
 public:
     explicit AnimationManager(LedController* controller);

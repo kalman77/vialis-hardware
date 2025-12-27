@@ -48,7 +48,28 @@ void WebServerManager::handleStatus() {
 }
 
 void WebServerManager::handleToggleAnimation() {
-    animations->toggle();
+    // Parse JSON body if present
+    if (server.hasArg("plain")) {
+        String body = server.arg("plain");
+        DynamicJsonDocument doc(256);
+        deserializeJson(doc, body);
+
+        if (doc.containsKey("playing")) {
+            bool shouldPlay = doc["playing"];
+            if (shouldPlay) {
+                animations->start();
+            } else {
+                animations->stop();
+            }
+        } else {
+            // No 'playing' parameter - use toggle for backward compatibility
+            animations->toggle();
+        }
+    } else {
+        // No body - use toggle for backward compatibility
+        animations->toggle();
+    }
+
     server.send(200, "application/json",
         String("{\"animation\":") + (animations->isRunning() ? "true" : "false") + "}");
 }
