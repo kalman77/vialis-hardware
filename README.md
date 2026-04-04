@@ -1,61 +1,103 @@
 # Vialis Hardware
 
-Vialis Hardware is an ESP8266-based firmware project for controlling LED behavior and device interaction over Wi-Fi, with local input support and a web-based control surface.
+ESP8266 firmware for Wi-Fi-connected LED control with local joystick input, web controls, and modular animation/brightness features.
 
-The firmware is built with PlatformIO and Arduino, and organizes networking, hardware drivers, and feature modules into a clean, modular structure.
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/kalman77/vialis-hardware.git
+cd vialis-hardware
+pio run -e esp12e
+pio run -e esp12e --target upload
+pio device monitor -b 115200
+```
+
+Or with Makefile:
+
+```bash
+make build
+make upload
+make monitor
+```
+
+---
+
+## What This Project Does
+
+Vialis Hardware runs on an ESP8266 (`esp12e`) and provides:
+
+- LED rendering and effects
+- Brightness control logic
+- Joystick-based local interaction
+- Wi-Fi connectivity
+- HTTP web server control surface
+- Realtime/websocket integration hooks
+- Structured runtime logging
+
+The codebase is organized to separate:
+- **core runtime/networking**
+- **hardware abstraction**
+- **feature behavior**
+
+---
 
 ## Features
 
-- **ESP8266 firmware** targeting the `esp12e` board profile.
-- **Wi-Fi connectivity** via `WifiManager`.
-- **Web server control plane** for local/remote configuration and control.
-- **Realtime integration hooks** through a websocket manager interface.
-- **LED control subsystem** (`LedController`) for rendering and brightness changes.
-- **Animation engine** (`AnimationManager`) for dynamic LED effects.
-- **Brightness control** (`BrightnessController`) abstraction.
-- **Joystick input handling** for local/manual interaction.
-- **Structured logging** via a utility logger.
-- **Cross-platform build workflow** through PlatformIO and a convenience `Makefile`.
+- **ESP8266 firmware** targeting PlatformIO `env:esp12e`
+- **Wi-Fi management** (`WifiManager`)
+- **Web server control layer** (`WebServerManager`)
+- **Realtime integration support** (`WebsocketManager`, realtime interface)
+- **LED control subsystem** (`LedController`)
+- **Animation engine** (`AnimationManager`)
+- **Brightness controller** (`BrightnessController`)
+- **Joystick input** (`Joystick`)
+- **Cross-platform local tooling** via `Makefile`
+
+---
 
 ## Tech Stack
 
 - **Language:** C++
 - **Framework:** Arduino
-- **Platform:** PlatformIO
-- **Target MCU/Board:** ESP8266 (`esp12e` environment)
+- **Build System:** PlatformIO
+- **MCU/Board:** ESP8266 (`esp12e`)
 
 ### PlatformIO Dependencies
 
-Defined in `platformio.ini`:
+From `platformio.ini`:
 
-- `adafruit/Adafruit NeoPixel` (`^1.15.2`)
-- `bblanchon/ArduinoJson` (`^7.4.2`)
-- `gilmaimon/ArduinoWebsockets` (`^0.5.4`)
+- `adafruit/Adafruit NeoPixel@^1.15.2`
+- `bblanchon/ArduinoJson@^7.4.2`
+- `gilmaimon/ArduinoWebsockets@^0.5.4`
 
-## Project Structure
+---
 
-- `src/` - Primary firmware entrypoint and application wiring (`src/main.cpp`).
-- `core/` - Core services (e.g., Wi-Fi/web server/websocket managers).
-- `hardware/` - Hardware-facing controllers and peripherals (e.g., LEDs, joystick).
-- `features/` - End-user behavior modules (e.g., animations, brightness logic).
-- `include/` - Shared headers and project-wide interfaces/config headers.
-- `lib/` - Additional local libraries.
-- `utils/` - Utility helpers such as logging.
-- `scripts/` - Development/automation helper scripts.
-- `test/` - Unit/integration test scaffolding.
-- `docs/` - Additional project documentation.
-- `platformio.ini` - PlatformIO environment, board, and dependency configuration.
-- `Makefile` - Cross-platform wrapper targets for common development flows.
+## Repository Layout
 
-> Note: a root-level `main.cpp` is present, but `src/main.cpp` is the standard PlatformIO application entrypoint and appears to be the active one.
+- `src/` - Main firmware entrypoint and runtime wiring (`src/main.cpp`)
+- `core/` - Wi-Fi, web server, websocket, and orchestration services
+- `hardware/` - Device-facing modules (LEDs, joystick, etc.)
+- `features/` - Animations, brightness, and behavior logic
+- `include/` - Shared headers, interfaces, configuration headers
+- `lib/` - Local libraries
+- `utils/` - Utility helpers (e.g., logger)
+- `scripts/` - Dev/automation scripts
+- `test/` - Test scaffolding
+- `docs/` - Project documentation
+- `platformio.ini` - Build target + dependency config
+- `Makefile` - Convenience targets for build/upload/monitor/test
+
+> Note: a root `main.cpp` exists, but `src/main.cpp` is the standard PlatformIO entrypoint and appears to be the active one.
+
+---
 
 ## Architecture Overview
 
-At startup, the firmware initializes serial logging, connects to Wi-Fi, starts web services, and initializes hardware controllers. In the main loop, it continuously services network components and feature updates.
+From `src/main.cpp`, startup and runtime flow:
 
-From `src/main.cpp`, the core runtime wiring is:
-
-1. Initialize singleton/service objects:
+1. Construct managers/controllers:
    - `WifiManager`
    - `LedController`
    - `AnimationManager`
@@ -63,92 +105,92 @@ From `src/main.cpp`, the core runtime wiring is:
    - `WebsocketManager`
    - `WebServerManager`
    - `Joystick`
-2. `setup()` responsibilities:
-   - Start serial logging
-   - Connect Wi-Fi using `state.ssid` and `state.pswd`
-   - Start web server and websocket manager
-   - Initialize LEDs and joystick
-3. `loop()` responsibilities:
-   - Run Wi-Fi maintenance loop
-   - Run web server loop
-   - Poll joystick
-   - Advance animations
+2. `setup()`:
+   - start serial logging
+   - connect Wi-Fi using `state.ssid` / `state.pswd`
+   - start web server and websocket manager
+   - initialize LED + joystick hardware
+3. `loop()`:
+   - service Wi-Fi loop
+   - service web server loop
+   - poll joystick
+   - advance animations
 
-This separation keeps transport/control logic (Wi-Fi, HTTP/WebSocket) distinct from hardware control and visual behavior.
+This keeps networking/control concerns cleanly separated from hardware and feature logic.
 
-## Getting Started
+---
 
-### Prerequisites
+## Hardware / Wiring
 
-- [PlatformIO Core](https://platformio.org/install) (or PlatformIO IDE extension)
-- Python environment compatible with PlatformIO
-- ESP8266-compatible board (configured as `esp12e`)
-- USB serial connection for flashing and monitoring
+> Update this section with your exact board and pin assignments.
 
-### Clone
+### Supported Target
 
-```bash
-git clone https://github.com/kalman77/vialis-hardware.git
-cd vialis-hardware
-```
+- ESP8266 board profile: `esp12e`
 
-### Build
+### Suggested Pin Mapping Template
 
-Using PlatformIO directly:
+| Signal / Peripheral | GPIO Pin | Notes |
+|---|---:|---|
+| LED Data | `TODO` | NeoPixel/WS2812 data line |
+| Joystick X | `TODO` | Analog/digital input |
+| Joystick Y | `TODO` | Analog/digital input |
+| Joystick Button | `TODO` | Optional pull-up/down |
+| Status LED (optional) | `TODO` | Debug/status indicator |
+
+### Power & Safety Notes
+
+- Use a stable power source sized for LED current draw.
+- Ensure **common ground** between ESP8266 and LED strip/power supply.
+- Consider a resistor on LED data line and bulk capacitor on LED power rails for stability.
+- Do not power large LED loads directly from the ESP8266 regulator.
+
+---
+
+## Build, Flash, Monitor
+
+### PlatformIO
+
+Build:
 
 ```bash
 pio run -e esp12e
 ```
 
-Or via Makefile:
-
-```bash
-make build
-```
-
-### Upload Firmware
-
-PlatformIO:
+Upload:
 
 ```bash
 pio run -e esp12e --target upload
 ```
 
-Makefile wrapper:
-
-```bash
-make upload
-```
-
-### Serial Monitor
-
-```bash
-pio device monitor -b 115200
-```
-
-or:
-
-```bash
-make monitor
-```
-
-### Run Tests
+Test:
 
 ```bash
 pio test -e esp12e
 ```
 
-or:
+Monitor:
 
 ```bash
-make test
+pio device monitor -b 115200
 ```
+
+### Makefile Shortcuts
+
+- `make build` / `make compile` - Build firmware
+- `make upload` / `make flash` - Upload firmware
+- `make monitor` - Open serial monitor
+- `make clean` - Remove `.pio` artifacts
+- `make test` - Run tests
+- `make list` - List serial devices
+- `make info` - Show environment/build info
+- `make help` - Show all targets
+
+---
 
 ## Configuration
 
 ### PlatformIO Environment
-
-The default environment is defined as:
 
 ```ini
 [env:esp12e]
@@ -157,50 +199,69 @@ board = esp12e
 framework = arduino
 ```
 
-### Runtime Configuration
+### Runtime Credentials / State
 
-The firmware references runtime credentials/state (`state.ssid`, `state.pswd`) from project headers/source (e.g., `state.hpp` / config layer). Ensure your local configuration is set before flashing.
+Wi-Fi credentials are read from the project state/config layer (`state.ssid`, `state.pswd` references in `main.cpp`).
 
-If secrets are stored in source during development, prefer local-only files and avoid committing credentials.
+Recommended practice:
+- keep secrets in local-only config
+- never commit real credentials
+- document local setup in `docs/` (if not already)
 
-## Makefile Targets
+---
 
-Available convenience targets include:
+## Web/API Notes
 
-- `make build` / `make compile` - Build firmware
-- `make upload` / `make flash` - Upload firmware
-- `make monitor` - Open serial monitor
-- `make clean` - Remove `.pio` artifacts
-- `make test` - Run tests
-- `make list` - List serial devices
-- `make info` - Print environment details
-- `make help` - Show target help
+The firmware initializes web and realtime components (`WebServerManager`, `WebsocketManager`), but endpoint-level API documentation is not yet centralized.
 
-## Development Notes
+Recommended next step:
+- add `docs/api.md` with HTTP routes, websocket events, and payload schema examples.
 
-- Keep feature logic in `features/`, and hardware abstractions in `hardware/`.
-- Use `core/` for transport/runtime orchestration.
-- Prefer interface-based integration (e.g., realtime abstractions) to keep modules decoupled.
-- Maintain a single canonical firmware entrypoint in `src/main.cpp` to avoid drift.
+---
+
+## Contributing
+
+1. Create a feature branch
+2. Keep changes scoped by module (`core/`, `hardware/`, `features/`)
+3. Build and run tests locally
+4. Open a PR with:
+   - summary of behavior change
+   - test evidence
+   - hardware validation notes (if relevant)
+
+### Local Quality Checklist
+
+- [ ] Builds successfully with `pio run -e esp12e`
+- [ ] Upload succeeds on target board
+- [ ] Serial logs are readable and useful
+- [ ] No credentials/secrets committed
+- [ ] README/docs updated when behavior changes
+
+---
 
 ## Troubleshooting
 
-- **Build fails on missing libraries**
-  - Run `pio pkg install` or rebuild to allow PlatformIO to resolve dependencies.
-- **Upload port not found**
-  - Run `pio device list` (or `make list`) and set an explicit upload port in `platformio.ini` if needed.
+- **Missing dependencies during build**
+  - Re-run build; PlatformIO should resolve deps automatically.
+- **Board not detected**
+  - Use `pio device list` / `make list`, then set explicit upload port.
 - **No serial output**
-  - Verify monitor baud rate and board connection.
-- **Wi-Fi not connecting**
-  - Verify `state.ssid` / `state.pswd` values and network availability.
+  - Verify monitor baud and USB serial port.
+- **Wi-Fi connection failure**
+  - Verify SSID/password config and signal/network availability.
 
-## Roadmap Ideas
+---
 
-- Add a dedicated configuration guide in `docs/` for credentials and environment setup.
-- Document web server and websocket API endpoints.
-- Add architecture diagrams for module interactions.
-- Expand tests for feature and hardware abstraction layers.
+## Roadmap
+
+- Add complete wiring documentation with real pin assignments
+- Document HTTP + websocket APIs
+- Add architecture diagram in `docs/`
+- Expand automated tests for feature modules and hardware abstractions
+- Add CI for build/test on push
+
+---
 
 ## License
 
-No license file is currently present in this repository. Add a `LICENSE` file if you intend to define distribution and usage terms.
+No `LICENSE` file is currently present. Add one to define usage/distribution terms.
